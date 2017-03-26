@@ -1,0 +1,77 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd ">
+		
+		
+	<!--映射器（注解方式） -->
+	<!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/> -->
+	<!--适配器（注解方式） -->
+	<!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/> -->
+	
+	<!-- 该行配置取代上面两行的配置 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json;charset=utf-8</value>
+						<value>text/html;charset=utf-8</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	<!-- 扫描注解方式的handler controller cn.itcast.ssm.controller包下的都扫描-->
+	<context:component-scan base-package="cn.net.fusen.ssm.controller,cn.net.fusen.ssm.service.impl"></context:component-scan>
+	<!-- 声明自动为spring容器中那些配置@aspectJ切面的bean创建代理，织入切面 -->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	
+	<!-- 视图解析器
+	解析jsp解析，默认使用jstl标签，classpath下的得有jstl的包
+	 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 配置jsp路径的前缀 -->
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<!-- 配置jsp路径的后缀 -->
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<!-- <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="cn.net.fusen.ssm.interceptor.TestInterceptor"></bean>
+		</mvc:interceptor>
+	
+	</mvc:interceptors> -->
+
+	<bean id="dataSourceSwitchAspect" class="cn.net.fusen.ssm.aop.DataSourceSwitchAspect"></bean>
+	<aop:config>
+		<aop:aspect id="dataSourceSwitchAspect" ref="dataSourceSwitchAspect">
+			<aop:around method="around" pointcut="execution(* cn.net.fusen.ssm.controller.sqlserver..*.*(..))"/>
+		</aop:aspect>	
+	</aop:config>
+	
+	<!-- <bean id="aopTestAspect" class="cn.net.fusen.ssm.aop.AopTestAspect" ></bean> -->
+	<!-- <aop:config>
+		<aop:aspect id="aopTestAspect" ref="aopTestAspect">
+			<aop:before method="qianZhiTZ" pointcut="execution(* cn.net.fusen.ssm.controller.sqlserver.TestSqlServerDBController.*(..))" />
+			<aop:around method="testAround" pointcut="execution(* cn.net.fusen.ssm.controller.sqlserver.TestSqlServerDBController.*(..))"/>
+		</aop:aspect>
+	</aop:config> -->
+	
+	
+	
+
+</beans>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.fusen.ssm.mapper.MobileOrder">
+   <cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true"></cache>
+    <select id="selectGetUserOrder" parameterType="cn.net.fusen.ssm.mapper.BO" resultType="cn.net.fusen.ssm.po.UserOrder">
+        select O1.ORDA001OID,O1.FSNO,O1.ORDERSTATUS,O1.CUSTORDERNO from b2b_ordSelList O1 
+			where
+			<if test=" ERPUSEROID != '' and  ERPUSEROID != null">
+			O1.BASB001_FK= #{ERPUSEROID}
+            </if>
+            <if test="MINONO == 9 ">
+                and convert(decimal(10,0),O1.ONO) &lt; #{MINONO}      
+            </if>
+            <if test="MAXONO == 9 ">
+                and convert(decimal(10,0),O1.ONO) &gt;= #{MAXONO}       
+            </if>
+                order by O1.OrderDate desc    
+    </select>
+    
+    <select id="selectGetOrderLogistics" resultType="cn.net.fusen.ssm.po.OrderLogistics">
+        select  otime,otype,refno,Remark from ORDHistoryD1 
+			where 
+		 <if test="ERPUSEROID != null and ERPUSEROID != '' ">
+    		ORDHistory_FK= #{ERPUSEROID}
+    	 </if>
+    	 and ono not in (2,3,5,6,9) order by OTime
+    </select>
+</mapper>

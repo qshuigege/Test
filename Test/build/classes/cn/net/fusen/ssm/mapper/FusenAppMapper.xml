@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.fusen.ssm.mapper.FusenAppMapper">
+   <cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true"></cache>
+    <select id="selectPSSTATUS" resultType="int">
+       SELECT COUNT(*) FROM dbo.SHPC002 AS P2
+       INNER JOIN dbo.BASB001 AS B1 ON P2.BASB001_FK_Cust = B1.BASB001OID
+       INNER JOIN dbo.BASB002 AS B2 ON B1.BASB001OID = B2.BASB001_FK
+			where
+		<if test=" psorder != '' and  psorder != null">
+			P2.Docno = #{psorder}
+        </if>
+        AND P2.DocType = '1'      
+	    AND ISNULL(B2.bUploadPho,0)=1
+    </select>
+</mapper>

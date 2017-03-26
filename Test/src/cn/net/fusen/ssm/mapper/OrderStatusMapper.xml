@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.fusen.ssm.mapper.OrderStatusMapper" >
+
+	<!-- 查询订单状态 -->
+	<select id="" parameterType="java.lang.String" resultType="int">
+		select count(0) num from wxaccount a, wxacc_orguser_relation r where a.unionid = r.unionid and a.unionid=#{unionid}
+	</select>
+	
+	<select id="getErpoidByOpenid" parameterType="hashmap" resultType="string" statementType="CALLABLE">
+		{call proc_geterpoidbyopenid(#{openid},#{erpoid,jdbcType=VARCHAR,mode=OUT})}
+	</select>
+</mapper>

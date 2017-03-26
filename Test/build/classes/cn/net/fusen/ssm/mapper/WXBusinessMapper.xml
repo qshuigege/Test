@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.fusen.ssm.mapper.WXBusinessMapper" >
+
+	<!-- 根据unionid查询该微信号是否已经绑定b2b账号 -->
+	<select id="isBinded" parameterType="java.lang.String" resultType="int">
+		select count(0) num from wxaccount a, wxacc_orguser_relation r where a.unionid = r.unionid and a.unionid=#{unionid}
+	</select>
+	
+	<!-- 根据uniqueid获取orgid -->
+	<select id="getOrgidByUniqueid" parameterType="java.lang.String" resultType="string">
+		select id from orguser where uniqueid = #{uniqueid}
+	</select>
+	
+	<!-- 绑定b2b账号 -->
+	<insert id="binding" parameterType="java.util.Map">
+		insert into wxacc_orguser_relation (unionid,orgid) values(#{unionid},#{orgid})
+	</insert>
+	
+	<!-- 解绑b2b账号 -->
+	<delete id="unbinding" parameterType="java.lang.String">
+		delete from wxacc_orguser_relation r where r.unionid = #{unionid}
+	</delete>
+	
+	<!-- 往wxaccount表中添加微信关注者账号 -->
+	<insert id="addAcc" parameterType="wXAccount" statementType="CALLABLE">
+		{call proc_addacc(#{openid},#{unionid},#{nickname},#{sex},#{province},#{city},#{country},
+		#{headimgurl},#{appid},#{subscribe},#{language},#{subscribe_time},#{remark},#{groupid},#{tagid_list})}
+	</insert>
+</mapper>

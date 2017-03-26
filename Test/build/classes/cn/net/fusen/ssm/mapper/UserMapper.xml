@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.fusen.ssm.mapper.UserMapper" >
+
+	<!-- 根据用户名和密码查找用户 -->
+	<select id="findUserByUseridAndPwd" parameterType="hashmap" resultType="user">
+		select * from sysuser where userid=#{userid} and password=#{password}
+	</select>
+	
+	<!-- 添加用户 -->
+	<insert id="addUser" parameterType="user">
+		insert into sysuser(userid,password,username,departmentid,roleid) values(#{userid},#{password},#{username},#{departmentid},#{roleid})
+	</insert>
+
+	<!-- 获得菜单树 -->
+	<select id="getMenuTree" parameterType="hashmap" statementType="CALLABLE">
+		{call getmenutree(
+			#{p_userid,javaType=String,jdbcType=VARCHAR,mode=IN},
+			#{menu1,javaType=java.sql.ResultSet,jdbcType=CURSOR,mode=OUT,resultMap=getMenuTree},
+			#{menu2,javaType=java.sql.ResultSet,jdbcType=CURSOR,mode=OUT,resultMap=getMenuTree},
+			#{menu3,javaType=java.sql.ResultSet,jdbcType=CURSOR,mode=OUT,resultMap=getMenuTree}
+		)}
+	</select>
+	<resultMap type="sysmenu" id="getMenuTree">
+		<result column="id" property="id" javaType="String" jdbcType="VARCHAR"/>
+		<result column="menuname" property="menuname" javaType="String" jdbcType="VARCHAR"/>
+		<result column="parentid" property="parentid" javaType="String" jdbcType="VARCHAR"/>
+		<result column="linkurl" property="linkurl" javaType="String" jdbcType="VARCHAR"/>
+		<result column="menudesc" property="menudesc" javaType="String" jdbcType="VARCHAR"/>
+		<result column="menulevel" property="menulevel" javaType="String" jdbcType="VARCHAR"/>
+	</resultMap>
+</mapper>

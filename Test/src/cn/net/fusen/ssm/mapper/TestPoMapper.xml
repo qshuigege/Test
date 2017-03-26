@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.fusen.ssm.mapper.TestPoMapper" >
+	
+	
+	<!-- 测试连接Oracle -->
+	<select id="findUserById" parameterType="hashmap" resultType="testPo">
+		select id from orguser where userid=#{userid}
+	</select>
+	<!-- 测试连接SqlServer -->
+	<select id="findB2b001oidByWebserviceno" parameterType="hashmap" resultType="testPo">
+		select b2b001oid from b2b001 where webserviceno=#{webserviceno}
+	</select>
+	
+	
+	<insert id="insertWithReturnPK" parameterType="chengPinChuKu_addrInfo">
+		insert into GKWDEL01ADD(GKWDEL01ADDOID,CreDate,SendCom,SendAdd,SendDetailAdd,Att,Tel,BASB001_FK)values
+		(
+			#{GKWDEL01ADDOID},GETDATE(),#{SendCom},#{SendAdd},#{SendDetailAdd},#{Att},#{Tel},#{BASB001_FK}
+		)
+		
+	</insert>
+	<!-- (#{item.name,jdbcType=VARCHAR}, #{item.logid,jdbcType=INTEGER},#{item.url,jdbcType=LONGVARCHAR}) -->
+	<insert id="insertByBatch" parameterType="java.util.List">
+        insert into GKWDEL01ADD(GKWDEL01ADDOID,CreDate,SendCom,SendAdd,SendDetailAdd,Att,Tel,BASB001_FK)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (NEWID(),GETDATE(),#{item.SendCom},#{item.SendAdd},#{item.SendDetailAdd},#{item.Att},#{item.Tel},#{item.BASB001_FK})
+        </foreach>
+    </insert>
+</mapper>

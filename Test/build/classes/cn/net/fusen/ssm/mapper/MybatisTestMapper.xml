@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.fusen.ssm.mapper.MybatisTestMapper" >
+
+	<select id="getList" resultType="cn.net.fusen.ssm.po.Test">
+		select * from test
+	</select>
+
+	<select id="getListWithConditions" parameterType="java.util.Map" resultType="cn.net.fusen.ssm.po.Test">
+		select * from test 
+	</select>
+	
+	<select id="getListByProc" parameterType="java.util.Map" statementType="CALLABLE" >
+		{call proc_test_getlist(
+			#{aaa,javaType=String,jdbcType=VARCHAR,mode=IN},
+			#{bbb,javaType=java.math.BigDecimal,jdbcType=DECIMAL,mode=IN},
+			#{ccc,javaType=java.util.Date,jdbcType=DATE,mode=IN},
+			#{ddd,javaType=java.lang.Character,jdbcType=CHAR,mode=IN},
+			#{eee,javaType=int,jdbcType=INTEGER,mode=IN},
+			#{rt,javaType=java.sql.ResultSet,jdbcType=CURSOR,mode=OUT,resultMap=getListByProc}
+		)}
+	</select>
+	
+	<select id="getTwoCursor_proc_test_getList2_2" parameterType="java.util.Map" statementType="CALLABLE">
+		{call proc_test_getList2_2(
+			#{rt1,javaType=java.sql.ResultSet,jdbcType=CURSOR,mode=OUT,resultMap=rt1},
+			#{rt2,javaType=java.sql.ResultSet,jdbcType=CURSOR,mode=OUT,resultMap=rt2}
+		)}
+	</select>
+	
+	<!-- <select id="getListByProc2" parameterMap="getListByProc2" statementType="CALLABLE">
+		{call proc_test_getlist(
+		#{rt}
+		)}
+	</select>
+	
+	<select id="getListByProc3" parameterType="hashmap" statementType="CALLABLE" resultType="hashmap">
+		{call proc_test_getlist3(
+		#{uuid},#{aaa,jdbcType=VARCHAR,mode=OUT}
+		)}
+	</select> -->
+	
+	<!-- 根据type配置的类型，结果集为相应的类型 -->
+	<resultMap type="test" id="getListByProc">
+		<result column="uuid" property="uuid" javaType="String" jdbcType="VARCHAR"/>
+		<result column="aaa" property="aaa" javaType="String" jdbcType="VARCHAR"/>
+		<result column="bbb" property="bbb" javaType="java.math.BigDecimal" jdbcType="DECIMAL"/>
+		<result column="ccc" property="ccc" javaType="java.util.Date" jdbcType="DATE"/>
+		<result column="ddd" property="ddd" javaType="java.lang.Character" jdbcType="CHAR"/>
+		<result column="eee" property="eee" javaType="int" jdbcType="INTEGER"/>
+	</resultMap>
+	<resultMap type="test" id="rt1">
+		<result column="uuid" property="uuid" javaType="String" jdbcType="VARCHAR"/>
+		<result column="aaa" property="aaa" javaType="String" jdbcType="VARCHAR"/>
+		<result column="bbb" property="bbb" javaType="java.math.BigDecimal" jdbcType="DECIMAL"/>
+		<result column="ccc" property="ccc" javaType="java.util.Date" jdbcType="DATE"/>
+		<result column="ddd" property="ddd" javaType="java.lang.Character" jdbcType="CHAR"/>
+		<result column="eee" property="eee" javaType="int" jdbcType="INTEGER"/>
+	</resultMap>
+	<resultMap type="orguser" id="rt2">
+		<result column="id" property="id" javaType="String" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<!-- 这种写法报错，无效的列类型 
+	<parameterMap type="hashmap" id="getListByProc">
+		<parameter property="rt" javaType="java.sql.ResultSet" jdbcType="OTHER" mode="OUT" resultMap="getListByProc"/>
+		<parameter property="aaa" javaType="String" jdbcType="VARCHAR" mode="IN"/>
+		<parameter property="bbb" javaType="java.math.BigDecimal" jdbcType="DECIMAL" mode="IN"/>
+		<parameter property="ccc" javaType="java.util.Date" jdbcType="DATE" mode="IN"/>
+		<parameter property="ddd" javaType="java.lang.Character" jdbcType="CHAR" mode="IN"/>
+		<parameter property="eee" javaType="int" jdbcType="INTEGER" mode="IN"/>
+	</parameterMap>
+	 -->
+	<!-- javaType,jdbcType,mode,numericScale,resultMap,typeHandler,jdbcTypeName -->
+	<!-- <parameterMap  type="hashmap" id="getListByProc2">
+		<parameter  property="rt" jdbcType="CURSOR" mode="OUT" resultMap="getListByProc"/>
+	</parameterMap> -->
+	
+	<insert id="save" parameterType="cn.net.fusen.ssm.po.Test">
+		insert into test(aaa,bbb,ccc,ddd,eee)values(#{aaa},#{bbb},#{ccc},#{ddd},#{eee})
+	</insert>
+	
+	
+	<!-- 成品出库 -->
+	<select id="getCaiGouDanList" parameterType="hashmap" resultType="chengPinChuKu">
+    	SELECT top ${pageSize}  * 
+		FROM(
+			SELECT  ROW_NUMBER() OVER (order by ttt.GCDate DESC) as rownum, * 
+			FROM(
+				SELECT GKW01D1.GKW01D1OID ,
+					( SELECT TOP 1
+								PartnerShortName
+					  FROM      dbo.BASB001
+					  WHERE     BASB001OID = alGKW01_FK.BASB001_FK
+					) AS 'PartnerShortName',
+					alGKW01_FK.GKWNo ,
+					alGKW01_FK.GCDate ,
+					GKW01D1.FIName ,
+					GKW01D1.FIProNo ,
+					GKW01D1.FIOrdNo ,
+					GKW01D1.FIWLNo ,
+					GKW01D1.MZCWLNo ,
+					GKW01D1.Suplier ,
+					GKW01D1.FIBrand ,
+					GKW01D1.GCChip ,
+					GKW01D1.GCQty ,
+					GKW01D1.YCKqty ,
+					( ISNULL(GCQty, 0) - ISNULL(YCKqty, 0) ) AS 'Remains' ,
+					GKW01D1.GKW01_FK ,       
+					alGKW01_FK.BASB001_FK 
+				FROM    GKW01D1
+					LEFT OUTER JOIN GKW01 alGKW01_FK ON GKW01D1.GKW01_FK = alGKW01_FK.GKW01OID 
+					WHERE alGKW01_FK.BASB001_FK = '${erpUserOID}' 
+					<if test="param_GKWNo!=null and param_GKWNo!=''">
+						and alGKW01_FK.GKWNo ='${param_GKWNo}'
+					</if>
+					<if test="param_FIOrdNo!=null and param_FIOrdNo!=''">
+						and GKW01D1.FIOrdNo='${param_FIOrdNo}'
+					</if>
+			)as ttt
+			
+		)as uuu where uuu.rownum&gt;${rowIndex}
+		
+	</select>
+	
+	<select id="getCaiGouDanCount" parameterType="hashmap" resultType="int">
+		SELECT COUNT(0)
+				FROM    GKW01D1
+					LEFT OUTER JOIN GKW01 alGKW01_FK ON GKW01D1.GKW01_FK = alGKW01_FK.GKW01OID 
+					WHERE alGKW01_FK.BASB001_FK = '${erpUserOID}' 
+					<if test="param_GKWNo!=null and param_GKWNo!=''">
+						and alGKW01_FK.GKWNo ='${param_GKWNo}'
+					</if>
+					<if test="param_FIOrdNo!=null and param_FIOrdNo!=''">
+						and GKW01D1.FIOrdNo='${param_FIOrdNo}'
+					</if>
+			
+	</select>
+</mapper>
